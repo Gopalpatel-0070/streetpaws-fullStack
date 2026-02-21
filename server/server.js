@@ -173,9 +173,12 @@ const startServer = async () => {
   });
 };
 
-startServer().catch((error) => {
-  logger.error('Failed to start server:', error);
-  process.exit(1);
-});
+// Only start server if not in Vercel/serverless environment
+if (require.main === module) {
+  startServer().catch((error) => {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}
 
-module.exports = { app, server, io };
+module.exports = app;
