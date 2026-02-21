@@ -21,13 +21,21 @@ const { errorHandler, notFound } = require('./middleware/errorHandler');
 
 // Initialize Express app
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
-});
+
+// In serverless environments (Vercel) avoid creating a long-lived HTTP server
+// and Socket.IO instance at module import time. Vercel invokes the exported
+// `app` per request; creating servers or writing logs to disk can fail.
+let server;
+let io;
+if (!process.env.VERCEL) {
+  server = http.createServer(app);
+  io = socketIo(server, {
+    cors: {
+      origin: process.env.CLIENT_URL || "http://localhost:3000",
+      methods: ["GET", "POST"]
+    }
+  });
+}
 
 // Logger setup
 const logger = winston.createLogger({
@@ -38,16 +46,21 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { service: 'streetpaws-backend' },
-  transports: [
-    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'logs/combined.log' }),
-  ],
+  transports: [],
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
-  }));
+// Add file transports only when not running in Vercel (serverless) to avoid
+// filesystem write errors. Use console transport in serverless/production.
+if (!process.env.VERCEL) {
+  logger.add(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
+  logger.add(new winston.transports.File({ filename: 'logs/combined.log' }));
+} else {
+  logger.add(new winston.transports.Console({ format: winston.format.simple() }));
+}
+
+// In non-production local development also log to console
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
 
 // Rate limiting
@@ -124,22 +137,24 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Socket.io for real-time features
-io.on('connection', (socket) => {
-  logger.info('New client connected', { socketId: socket.id });
+// Socket.io for real-time features (only when initialized)
+if (io) {
+  io.on('connection', (socket) => {
+    logger.info('New client connected', { socketId: socket.id });
 
-  socket.on('join-pet', (petId) => {
-    socket.join(`pet-${petId}`);
-  });
+    socket.on('join-pet', (petId) => {
+      socket.join(`pet-${petId}`);
+    });
 
-  socket.on('leave-pet', (petId) => {
-    socket.leave(`pet-${petId}`);
-  });
+    socket.on('leave-pet', (petId) => {
+      socket.leave(`pet-${petId}`);
+    });
 
-  socket.on('disconnect', () => {
-    logger.info('Client disconnected', { socketId: socket.id });
+    socket.on('disconnect', () => {
+      logger.info('Client disconnected', { socketId: socket.id });
+    });
   });
-});
+}
 
 // Make io accessible in routes
 app.set('io', io);
