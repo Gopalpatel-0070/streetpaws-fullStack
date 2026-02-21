@@ -76,6 +76,7 @@ const corsOptions = {
     const allowedOrigins = [
       process.env.CLIENT_URL || "http://localhost:3001",
       "https://streetpaws-frontend.vercel.app",
+      "https://streetpaw.vercel.app",
       "http://localhost:3001",
       "http://localhost:3000"
     ];
