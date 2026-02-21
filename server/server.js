@@ -140,6 +140,15 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Root route: redirect to frontend if configured, otherwise show basic API info
+app.get('/', (req, res) => {
+  const clientUrl = process.env.CLIENT_URL;
+  if (clientUrl) {
+    return res.redirect(clientUrl);
+  }
+  return res.status(200).json({ success: true, message: 'StreetPaws API', docs: '/api-docs' });
+});
+
 // Socket.io for real-time features (only when initialized)
 if (io) {
   io.on('connection', (socket) => {
