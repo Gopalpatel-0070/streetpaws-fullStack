@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "MONGO_URI": "@mongo_uri",
+    "JWT_SECRET": "@jwt_secret",
+    "CLIENT_URL": "@client_url",
+    "API_URL": "@api_url",
+    "GOOGLE_GENAI_API_KEY": "@google_genai_api_key"
+  },
+  "regions": [
+    "iad1"
+  ]
+}

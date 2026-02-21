@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+.next/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+.env*.production
+
+# Logs
+logs/
+*.log
+
+# Vercel
+.vercel/

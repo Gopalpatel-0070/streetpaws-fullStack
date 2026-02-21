@@ -1,0 +1,22 @@
+{
+  "name": "streetpaws",
+  "version": "1.0.0",
+  "description": "StreetPaws - Pet Adoption Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run dev\"",
+    "build": "npm run build --workspace=client && npm run build --workspace=server",
+    "start": "cd server && npm start",
+    "preview": "cd client && npm run preview"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
