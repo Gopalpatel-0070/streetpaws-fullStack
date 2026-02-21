@@ -14,21 +14,22 @@ const router = express.Router();
 
 // Initialize Google GenAI only if API key is available
 let genAI = null;
-try {
-  if (process.env.GOOGLE_GENAI_API_KEY && GoogleGenAI) {
-    genAI = new GoogleGenAI(process.env.GOOGLE_GENAI_API_KEY);
-  }
-} catch (error) {
-  console.warn('Google GenAI initialization failed:', error.message);
-}
+// try {
+//   if (process.env.GOOGLE_GENAI_API_KEY && GoogleGenAI) {
+//     genAI = new GoogleGenAI(process.env.GOOGLE_GENAI_API_KEY);
+//   }
+// } catch (error) {
+//   console.warn('Google GenAI initialization failed:', error.message);
+// }
 
 // @desc    Generate pet description using AI
 // @route   POST /api/ai/generate-description
 // @access  Private
 router.post('/generate-description', protect, asyncHandler(async (req, res) => {
-  if (!genAI) {
-    throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
-  }
+  // if (!genAI) {
+  //   throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
+  // }
+  throw new AppError('AI service is disabled.', 503);
 
   const { petType, traits, age, location } = req.body;
 
@@ -76,9 +77,10 @@ router.post('/generate-description', protect, asyncHandler(async (req, res) => {
 // @route   POST /api/ai/suggest-names
 // @access  Private
 router.post('/suggest-names', protect, asyncHandler(async (req, res) => {
-  if (!genAI) {
-    throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
-  }
+  // if (!genAI) {
+  //   throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
+  // }
+  throw new AppError('AI service is disabled.', 503);
 
   const { petType, traits, color } = req.body;
 
@@ -124,9 +126,10 @@ router.post('/suggest-names', protect, asyncHandler(async (req, res) => {
 // @route   POST /api/ai/analyze-image
 // @access  Private
 router.post('/analyze-image', protect, asyncHandler(async (req, res) => {
-  if (!genAI) {
-    throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
-  }
+  // if (!genAI) {
+  //   throw new AppError('AI service is not configured. Please set GOOGLE_GENAI_API_KEY in environment variables.', 503);
+  // }
+  throw new AppError('AI service is disabled.', 503);
 
   const { imageUrl } = req.body;
 

@@ -693,12 +693,13 @@ function PetFormModal({ isOpen, onClose, onSubmit, darkMode, initialData }: { is
     if (!formData.name || !formData.traits) return;
     setLoadingBio(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const res = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
-          contents: `Create a heartwarming, emotional 2-sentence adoption bio for a stray ${formData.type} named ${formData.name}. Traits: ${formData.traits}. Focus on empathy and a new beginning.`
-      });
-      setFormData(prev => ({ ...prev, description: res.text?.trim() || "" }));
+      // const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      // const res = await ai.models.generateContent({
+      //     model: 'gemini-3-flash-preview',
+      //     contents: `Create a heartwarming, emotional 2-sentence adoption bio for a stray ${formData.type} named ${formData.name}. Traits: ${formData.traits}. Focus on empathy and a new beginning.`
+      // });
+      // setFormData(prev => ({ ...prev, description: res.text?.trim() || "" }));
+      alert("AI generation is disabled.");
     } catch {
       alert("AI generator failed. Please write manually.");
     } finally { setLoadingBio(false); }

@@ -72,10 +72,8 @@ Once the server is running, visit `http://localhost:5000/api-docs` for interacti
 | `NODE_ENV` | Environment mode | development |
 | `PORT` | Server port | 5000 |
 | `MONGO_URI` | MongoDB connection string | mongodb://localhost:27017/streetpaws |
-| `JWT_SECRET` | JWT signing secret | - |
-| `JWT_EXPIRE` | JWT expiration time | 7d |
-| `GOOGLE_GENAI_API_KEY` | Google GenAI API key | - |
 | `CLIENT_URL` | Frontend URL | http://localhost:3000 |
+| `API_URL` | Backend API URL | http://localhost:5000 |
 
 ## API Endpoints
 
