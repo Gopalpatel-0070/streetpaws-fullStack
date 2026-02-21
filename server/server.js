@@ -192,13 +192,24 @@ const connectDB = async () => {
     const opts = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      // Timeouts: fail fast if MongoDB is unreachable
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      family: 4
     };
 
-    cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongoose) => {
+    const uri = process.env.MONGO_URI;
+    if (!uri) {
+      const err = new Error('MONGO_URI is not set in environment');
+      logger.error(err.message);
+      throw err;
+    }
+
+    cached.promise = mongoose.connect(uri, opts).then((mongoose) => {
       logger.info('MongoDB Connected');
       return mongoose;
     }).catch((error) => {
-      logger.error('Database connection error:', error);
+      logger.error('Database connection error:', error && error.message ? error.message : error);
       throw error;
     });
   }
