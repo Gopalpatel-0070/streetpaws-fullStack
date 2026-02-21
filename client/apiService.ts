@@ -1,8 +1,25 @@
 // API Service for backend communication
-const API_BASE_URL = process.env.API_BASE_URL || 
+let API_BASE_URL = process.env.API_BASE_URL || 
   (typeof window !== 'undefined' && window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api'
-    : 'https://streetpaws-backend.vercel.app/api');
+    : 'https://streetpaws-full-stack-server.vercel.app/api');
+
+// Normalize API_BASE_URL to ensure it is an absolute URL with protocol.
+// Common misconfiguration: missing "https://" in VITE_API_BASE_URL causes
+// the browser to treat it as a relative path, producing URLs like
+// https://frontend.app/<backend.domain>/auth/register which return 404.
+if (API_BASE_URL && !API_BASE_URL.startsWith('http')) {
+  // If it starts with //, add https:
+  if (API_BASE_URL.startsWith('//')) {
+    API_BASE_URL = 'https:' + API_BASE_URL;
+  } else {
+    // Otherwise assume https if protocol omitted
+    API_BASE_URL = 'https://' + API_BASE_URL.replace(/^\/+/, '');
+  }
+  // Ensure no trailing slash
+  API_BASE_URL = API_BASE_URL.replace(/\/$/, '');
+  console.warn('Normalized API_BASE_URL to', API_BASE_URL);
+}
 
 interface AuthResponse {
   success: boolean;
