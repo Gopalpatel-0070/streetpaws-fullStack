@@ -39,7 +39,17 @@
 - [ ] `API_URL=https://<backend-domain>`
 - [ ] `GOOGLE_GENAI_API_KEY=<your_api_key>` (optional)
 
-### Frontend (Via Vercel Settings)
+## Environment Variables
+
+### Backend (Via Vercel Settings)
+- [ ] `NODE_ENV=production`
+- [ ] `MONGO_URI=<your_connection_string>`
+- [ ] `JWT_SECRET=<secure_random_string>`
+- [ ] `CLIENT_URL=https://<frontend-domain>`
+- [ ] `API_URL=https://<backend-domain>`
+- [ ] `GOOGLE_GENAI_API_KEY=<your_api_key>` (optional)
+
+### Frontend (Via Vercel Settings - Regular Environment Variables, NOT Secrets)
 - [ ] `VITE_API_BASE_URL=https://<backend-domain>/api`
 - [ ] `VITE_GEMINI_API_KEY=<api_key>` (optional)
 

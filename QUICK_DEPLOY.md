@@ -60,7 +60,7 @@ GOOGLE_GENAI_API_KEY=optional-if-you-have-it
 VITE_API_BASE_URL=https://your-backend-url.vercel.app/api
 VITE_GEMINI_API_KEY=optional-if-you-have-it
 ```
-
+**Important:** Set these in your Vercel project dashboard under "Settings" → "Environment Variables". Do NOT use secrets for the API URL as it's a public endpoint.
 ---
 
 ## Files You Need to Know

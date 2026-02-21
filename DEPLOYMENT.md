@@ -116,6 +116,7 @@ npm run build
    VITE_API_BASE_URL=https://your-backend.vercel.app/api
    VITE_GEMINI_API_KEY=your_gemini_api_key
    ```
+   **Important:** Set these as regular environment variables in your Vercel project dashboard, NOT as secrets.
 
 4. **Deploy** - Vercel will auto-deploy on git push
 
