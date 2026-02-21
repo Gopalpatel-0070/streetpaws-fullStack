@@ -7,23 +7,33 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 const router = express.Router();
 
-// Ensure uploads directory exists
+// Determine environment: in Vercel serverless we cannot write to package dir
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+const isServerless = !!process.env.VERCEL;
 
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+// Configure multer storage: use disk storage locally, memory storage in serverless
+let storage;
+if (isServerless) {
+  storage = multer.memoryStorage();
+} else {
+  // Ensure uploads directory exists (only in non-serverless environments)
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+  } catch (err) {
+    // Fail gracefully; disk storage won't be available
+    console.warn('Failed to ensure uploads directory:', err.message);
   }
-});
+
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+}
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -53,11 +63,16 @@ router.post('/image', protect, upload.single('image'), asyncHandler(async (req, 
     throw new AppError('Please upload an image file', 400);
   }
 
-  // In a production app, you might want to:
-  // 1. Resize/compress the image
-  // 2. Upload to cloud storage (AWS S3, Cloudinary, etc.)
-  // 3. Generate multiple sizes/thumbnails
+  // If running in serverless, files are kept only in memory for the request
+  if (isServerless) {
+    // Instruct client to upload directly to cloud storage in production
+    return res.status(503).json({
+      success: false,
+      message: 'File uploads are disabled in serverless environment. Please upload directly to cloud storage.'
+    });
+  }
 
+  // Non-serverless: return local uploads URL
   const imageUrl = `/uploads/${req.file.filename}`;
 
   res.json({
@@ -76,34 +91,32 @@ router.post('/image', protect, upload.single('image'), asyncHandler(async (req, 
 // @route   DELETE /api/upload/image/:filename
 // @access  Private
 router.delete('/image/:filename', protect, asyncHandler(async (req, res) => {
+  if (isServerless) {
+    throw new AppError('File deletion not supported in serverless environment', 503);
+  }
+
   const filename = req.params.filename;
   const filePath = path.join(uploadsDir, filename);
 
-  // Check if file exists
   if (!fs.existsSync(filePath)) {
     throw new AppError('File not found', 404);
   }
 
-  // Delete file
   fs.unlinkSync(filePath);
 
-  res.json({
-    success: true,
-    data: {}
-  });
+  res.json({ success: true, data: {} });
 }));
 
 // @desc    Get uploaded images list (for admin)
 // @route   GET /api/upload/images
 // @access  Private (Admin only)
 router.get('/images', protect, asyncHandler(async (req, res) => {
-  // In a real app, you'd check if user is admin
-  // For now, just return list of files
+  if (isServerless) {
+    throw new AppError('Listing uploaded files is not supported in serverless environment', 503);
+  }
 
   fs.readdir(uploadsDir, (err, files) => {
-    if (err) {
-      throw new AppError('Unable to read uploads directory', 500);
-    }
+    if (err) throw new AppError('Unable to read uploads directory', 500);
 
     const images = files.map(filename => ({
       filename,
@@ -111,10 +124,7 @@ router.get('/images', protect, asyncHandler(async (req, res) => {
       path: path.join(uploadsDir, filename)
     }));
 
-    res.json({
-      success: true,
-      data: images
-    });
+    res.json({ success: true, data: images });
   });
 }));
 

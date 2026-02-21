@@ -35,9 +35,13 @@ export default defineConfig(({ mode }) => {
       build: {
         outDir: 'dist',
         sourcemap: false,
-        minify: 'terser',
-        target: 'ES2020',
-        cssCodeSplit: true
+        // Prefer esbuild for JS and CSS minification (faster, no terser dependency)
+        minify: 'esbuild',
+        cssMinify: 'esbuild',
+        target: 'es2020',
+        cssCodeSplit: true,
+        // Avoid noisy warnings on Netlify for large chunks
+        chunkSizeWarningLimit: 2000,
       }
     };
 });

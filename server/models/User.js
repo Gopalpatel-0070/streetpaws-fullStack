@@ -55,9 +55,9 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Index for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
+// Index for better query performance - avoid duplicate indexes (unique already creates indexes)
+// userSchema.index({ email: 1 });
+// userSchema.index({ username: 1 });
 
 // Virtual for full name
 userSchema.virtual('fullName').get(function() {
